@@ -5,7 +5,9 @@ import {useNavigate} from  'react-router';
 import { useState } from 'react';
 
 
-const Login = () => {
+
+
+const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -41,6 +43,7 @@ const Login = () => {
                 <input name="password" type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)}/>
             </div>
             <div>
+            
                 <button>ログイン</button>
                 {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </div>
@@ -52,4 +55,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default LoginForm;

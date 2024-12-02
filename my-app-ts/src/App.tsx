@@ -1,8 +1,9 @@
-import Login from './components/Login';
-import SignUp from './components/SignUp';
-import Home from './components/Home';
+import LoginForm from './components/LoginForm';
+import SignUpForm from './components/SignUpForm';
+import HomePage from './pages/HomePage';
 import { AuthProvider } from './context/AuthContext';
 import { BrowserRouter, Route ,Routes} from 'react-router-dom';
+
 
 function App() {
   return (
@@ -10,9 +11,9 @@ function App() {
       <div style={{ margin: '2em' }}>
         <BrowserRouter>
         <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-         <Route path="/home" element={<Home />} />
+        <Route path="/" element={<LoginForm />} />
+        <Route path="/signup" element={<SignUpForm />} />
+         <Route path="/home" element={<HomePage />} />
 
         </Routes>
         </BrowserRouter>
