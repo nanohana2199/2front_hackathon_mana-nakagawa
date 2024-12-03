@@ -4,6 +4,20 @@ import { Post } from '../types';
 import LikeButton from './LikeButton';
 import NewReplyForm from './NewReplyForm';
 import useCurrentUser from '../hooks/useCurrentUser';
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Avatar,
+  Divider,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from '@mui/material';
 
 interface PostItemProps {
   post: Post;
@@ -15,7 +29,13 @@ const PostItem: React.FC<PostItemProps> = ({ post, replies }) => {
   const [isReplying, setIsReplying] = useState<boolean>(false);
 
   if (user_id === null) {
-    return <p>ユーザーがログインしていません</p>;
+    return (
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" color="error">
+          ユーザーがログインしていません
+        </Typography>
+      </Box>
+    );
   }
 
   const handleReplyClick = () => {
@@ -23,31 +43,58 @@ const PostItem: React.FC<PostItemProps> = ({ post, replies }) => {
   };
 
   return (
-    <div>
-      <p>{post.content}</p>
-      <div>
-        <LikeButton post_id={Number(post.id)} user_id={user_id} />
-      </div>
+    <Card sx={{ mb: 2, p: 2 }}>
+      <CardContent>
+        <Typography variant="body1" gutterBottom>
+          {post.content}
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+        <CardActions>
+          <LikeButton post_id={Number(post.id)} user_id={user_id} />
+          <Button
+            variant="outlined"
+            onClick={handleReplyClick}
+            sx={{ ml: 2 }}
+          >
+            {isReplying ? 'キャンセル' : 'リプライ'}
+          </Button>
+        </CardActions>
 
-      <button onClick={handleReplyClick}>
-        {isReplying ? 'キャンセル' : 'リプライ'}
-      </button>
+        {isReplying && (
+          <Box sx={{ mt: 2 }}>
+            <NewReplyForm postId={Number(post.id)} user_id={user_id} />
+          </Box>
+        )}
+      </CardContent>
 
-      {isReplying && <NewReplyForm postId={Number(post.id)} user_id={user_id} />}
+      <Divider sx={{ mt: 2 }} />
 
       {/* リプライの表示 */}
-      <div>
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          リプライ
+        </Typography>
         {replies.length > 0 ? (
-          replies.map((reply, index) => (
-            <div key={index}>
-              <p>{reply.content}</p>
-            </div>
-          ))
+          <List>
+            {replies.map((reply, index) => (
+              <ListItem key={index} alignItems="flex-start">
+                <ListItemAvatar>
+                  <Avatar>{reply.userName ? reply.userName[0] : '?'}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={reply.content}
+                  secondary={reply.userName || '匿名ユーザー'}
+                />
+              </ListItem>
+            ))}
+          </List>
         ) : (
-          <p>リプライはありません</p>
+          <Typography variant="body2" color="textSecondary">
+            リプライはありません
+          </Typography>
         )}
-      </div>
-    </div>
+      </Box>
+    </Card>
   );
 };
 

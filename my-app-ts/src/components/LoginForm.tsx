@@ -3,6 +3,7 @@ import {auth} from '../firebase';
 import { Link } from 'react-router-dom';
 import {useNavigate} from  'react-router';
 import { useState } from 'react';
+import { Button, Box} from '@mui/material';
 
 
 
@@ -43,7 +44,7 @@ const LoginForm = () => {
                 <input name="password" type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)}/>
             </div>
             <div>
-            
+              
                 <button>ログイン</button>
                 {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </div>
