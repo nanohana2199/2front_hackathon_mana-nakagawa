@@ -1,6 +1,6 @@
 // src/components/PostList.tsx
 import React, { useState, useEffect } from 'react';
-import PostItem from './PostItem';
+import PostItem from './PostItemWithSidebar';
 import { Post } from '../types';
 import { getPosts } from '../api/post'; // getPostsをインポート
 import { getReplies } from '../api/reply'; // getRepliesをインポート
