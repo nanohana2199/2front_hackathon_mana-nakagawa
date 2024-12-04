@@ -1,4 +1,3 @@
-// src/components/PostItemWithSidebar.tsx
 import React, { useState } from 'react';
 import { Post } from '../types';
 import LikeButton from './LikeButton';
@@ -17,8 +16,6 @@ import {
   ListItem,
   ListItemText,
   Drawer,
-  Toolbar,
-  AppBar,
   IconButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -55,27 +52,21 @@ const PostItemWithSidebar: React.FC<PostItemProps> = ({ post, replies }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* AppBar */}
-      <AppBar
-        position="fixed"
-        sx={{ width: { sm: `calc(100% - ${drawerWidth}px)` }, ml: { sm: `${drawerWidth}px` } }}
+    <Box sx={{ display: 'flex', position: 'relative' }}>
+      {/* 三本線アイコン */}
+      <IconButton
+        color="inherit"
+        aria-label="open drawer"
+        onClick={handleDrawerToggle}
+        sx={{
+          position: 'absolute',
+          top: 16, // 上部からの位置
+          left: 16, // 左側からの位置
+          zIndex: 1300, // サイドバーより上に表示
+        }}
       >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            投稿詳細
-          </Typography>
-        </Toolbar>
-      </AppBar>
+        <MenuIcon />
+      </IconButton>
 
       {/* サイドバー */}
       <Drawer
@@ -83,22 +74,11 @@ const PostItemWithSidebar: React.FC<PostItemProps> = ({ post, replies }) => {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // モバイルでパフォーマンスを向上させるため
+          keepMounted: true, // モバイルパフォーマンス向上
         }}
         sx={{
-          display: { xs: 'block', sm: 'none' },
           '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
         }}
-      >
-        <Sidebar onItemSelect={handleSidebarItemSelect} />
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-        open
       >
         <Sidebar onItemSelect={handleSidebarItemSelect} />
       </Drawer>
@@ -109,10 +89,8 @@ const PostItemWithSidebar: React.FC<PostItemProps> = ({ post, replies }) => {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        <Toolbar />
         <Card sx={{ mb: 2, p: 2 }}>
           <CardContent>
             <Typography variant="body1" gutterBottom>
