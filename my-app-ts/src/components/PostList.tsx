@@ -61,7 +61,12 @@ const PostList: React.FC = () => {
         <p>投稿がありません</p>
       ) : (
         posts.map((post) => (
-          <PostItem key={post.id} post={post} replies={replies[String(post.id)] || []} />
+          <PostItem
+          key={post.id}
+          post={{ ...post, id: Number(post.id) }}
+          replies={replies[String(post.id)] || []}
+        />
+        
         ))
       )}
     </div>

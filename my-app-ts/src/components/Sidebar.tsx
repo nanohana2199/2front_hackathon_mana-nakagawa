@@ -17,17 +17,16 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
 
   return (
     <Box sx={{ width: drawerWidth, p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        メニュー
-      </Typography>
+      
       <Divider />
       <List>
-      <ListItem disablePadding>
-        <ListItemButton onClick={() => handleItemClick('プロフィール設定')}>
-          <ListItemText primary="プロフィール設定" />
-        </ListItemButton>
-      </ListItem>
-      </List>
+  <ListItem disablePadding>
+    <ListItemButton onClick={() => handleItemClick('プロフィール設定')}>
+      <ListItemText primary="プロフィール設定" />
+    </ListItemButton>
+  </ListItem>
+</List>
+
     </Box>
   );
 };

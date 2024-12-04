@@ -3,7 +3,7 @@ import SignUpForm from './components/SignUpForm';
 import HomePage from './pages/HomePage';
 import { AuthProvider } from './context/AuthContext';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Mui from './components/mui';
+
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
@@ -31,7 +31,7 @@ function App() {
               <Route path="/" element={<LoginForm />} />
               <Route path="/signup" element={<SignUpForm />} />
               <Route path="/home" element={<HomePage />} />
-              <Route path="/mui" element={<Mui />} />
+              
             </Routes>
           </div>
         </BrowserRouter>

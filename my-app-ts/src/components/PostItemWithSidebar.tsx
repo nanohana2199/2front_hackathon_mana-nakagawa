@@ -1,47 +1,59 @@
-import React, { useState } from 'react';
-import { Post } from '../types';
-import LikeButton from './LikeButton';
-import NewReplyForm from './NewReplyForm';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography } from '@mui/material';
+import SidebarComponent from './SidebarComponent';
+import PostItemMain from './PostItemMain';
 import useCurrentUser from '../hooks/useCurrentUser';
-import {
-  Box,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CardActions,
-  Avatar,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Drawer,
-  IconButton,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import Sidebar from './Sidebar';
+import { createReply, getReplies } from '../api/reply';
 
-interface PostItemProps {
-  post: Post;
-  replies: any[]; // リプライのデータ
+interface Reply {
+  id: number;
+  content: string;
+  userName?: string; // ユーザー名（任意）
 }
 
-const drawerWidth = 240;
+interface PostItemWithSidebarProps {
+  post: {
+    id: number;
+    content: string;
+  };
+  replies: any[]; // これを追加
+}
 
-const PostItemWithSidebar: React.FC<PostItemProps> = ({ post, replies }) => {
+const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
   const user_id = useCurrentUser();
-  const [isReplying, setIsReplying] = useState<boolean>(false);
-  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
+  const [isReplying, setIsReplying] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [replies, setReplies] = useState<Reply[]>([]);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  // リプライを取得
+  const fetchReplies = async () => {
+    try {
+      const fetchedReplies = await getReplies(post.id);
+      setReplies(fetchedReplies || []); // 空配列フォールバック
+    } catch (error) {
+      console.error('リプライの取得に失敗しました:', error);
+    }
   };
 
-  const handleSidebarItemSelect = (item: string) => {
-    console.log(`選択された項目: ${item}`);
+  // リプライを投稿
+  const handleReplySubmit = async (content: string) => {
+    if (!content.trim()) return; // 空文字を無視
+    const replyData = { content, postId: post.id, user_id: user_id || '' };
+    try {
+      await createReply(replyData);
+      fetchReplies(); // 送信後にリプライを再取得
+    } catch (error) {
+      console.error('リプライ送信中にエラーが発生しました:', error);
+    }
   };
 
-  if (user_id === null) {
+  // 初回レンダリング時にリプライを取得
+  useEffect(() => {
+    fetchReplies();
+  }, [post.id]);
+
+  // ログインしていない場合
+  if (!user_id) {
     return (
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" color="error">
@@ -52,91 +64,23 @@ const PostItemWithSidebar: React.FC<PostItemProps> = ({ post, replies }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', position: 'relative' }}>
-      {/* 三本線アイコン */}
-      <IconButton
-        color="inherit"
-        aria-label="open drawer"
-        onClick={handleDrawerToggle}
-        sx={{
-          position: 'absolute',
-          top: 16, // 上部からの位置
-          left: 16, // 左側からの位置
-          zIndex: 1300, // サイドバーより上に表示
-        }}
-      >
-        <MenuIcon />
-      </IconButton>
-
+    <Box sx={{ display: 'flex' }}>
       {/* サイドバー */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // モバイルパフォーマンス向上
-        }}
-        sx={{
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-      >
-        <Sidebar onItemSelect={handleSidebarItemSelect} />
-      </Drawer>
-
+      <SidebarComponent
+        mobileOpen={mobileOpen}
+        handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
+        onItemSelect={(item) => console.log(`選択された項目: ${item}`)}
+      />
       {/* メインコンテンツ */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-        }}
-      >
-        <Card sx={{ mb: 2, p: 2 }}>
-          <CardContent>
-            <Typography variant="body1" gutterBottom>
-              {post.content}
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <CardActions>
-              <LikeButton post_id={Number(post.id)} user_id={user_id} />
-              <Button
-                variant="outlined"
-                onClick={() => setIsReplying(!isReplying)}
-                sx={{ ml: 2 }}
-              >
-                {isReplying ? 'キャンセル' : 'リプライ'}
-              </Button>
-            </CardActions>
-            {isReplying && (
-              <Box sx={{ mt: 2 }}>
-                <NewReplyForm postId={Number(post.id)} user_id={user_id} />
-              </Box>
-            )}
-          </CardContent>
-          <Divider sx={{ mt: 2 }} />
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              リプライ
-            </Typography>
-            {replies.length > 0 ? (
-              <List>
-                {replies.map((reply, index) => (
-                  <ListItem key={index} alignItems="flex-start">
-                    <Avatar>{reply.userName ? reply.userName[0] : '?'}</Avatar>
-                    <ListItemText
-                      primary={reply.content}
-                      secondary={reply.userName || '匿名ユーザー'}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography variant="body2" color="textSecondary">
-                リプライはありません
-              </Typography>
-            )}
-          </Box>
-        </Card>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        {/* 投稿の内容 */}
+        <PostItemMain
+          postContent={post.content}
+          postId={post.id}
+          userId={user_id}
+          replies={replies}
+          onReplySubmit={handleReplySubmit}
+        />
       </Box>
     </Box>
   );
