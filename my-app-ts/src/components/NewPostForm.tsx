@@ -1,12 +1,15 @@
 // src/components/NewPostForm.tsx
 import React, { useState } from 'react';
 import { createPost } from '../api/post'; // api.tsからインポート
+import { Box, TextField, Button, Typography, CircularProgress, Alert, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface NewPostFormProps {
   onPostSubmit?: () => void; // 投稿完了時のコールバック
+  onClose?: () => void; // フォームを閉じるコールバック
 }
 
-const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit }) => {
+const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit, onClose }) => {
   const [content, setContent] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -52,21 +55,49 @@ const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <textarea
+    <Box 
+     component="form" 
+     onSubmit={handleSubmit}
+     sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        
+      <IconButton
+      onClick={onClose}
+      aria-label="close"
+      sx={{
+        position: 'absolute',
+        top: 8,
+        right: 8,
+      }}
+    >
+      <CloseIcon />
+      </IconButton>
+      </Box>
+      <TextField
+        multiline
+        rows={4}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Write a post..."
-        required
-        disabled={isSubmitting}  // 投稿中は編集不可
+        variant="outlined"
+        fullWidth
+        disabled={isSubmitting}
+        error={!!errorMessage}
+        helperText={errorMessage}
       />
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? '投稿中...' : 'Post'}
-      </button>
-
-      {/* エラーメッセージの表示 */}
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-    </form>
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isSubmitting}
+          startIcon={isSubmitting && <CircularProgress size={20} />}
+        >
+          {isSubmitting ? '投稿中...' : '投稿する'}
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

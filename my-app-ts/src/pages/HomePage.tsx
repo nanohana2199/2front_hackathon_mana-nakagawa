@@ -12,10 +12,8 @@ import AddIcon from '@mui/icons-material/Add';
 const HomePage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const toggleForm = () => {
-    setIsFormOpen(!isFormOpen);
-  };
-
+  const openForm = () => setIsFormOpen(true);
+  const closeForm = () => setIsFormOpen(false);
   
 
   const handlePostSubmit = () => {
@@ -35,7 +33,7 @@ const HomePage: React.FC = () => {
       <Button
         variant="contained"
         color="primary"
-        onClick={toggleForm}
+        onClick={openForm}
         sx={{
           position: 'fixed',
           bottom: 16,
@@ -67,7 +65,7 @@ const HomePage: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             新規投稿作成
           </Typography>
-          <NewPostForm onPostSubmit={handlePostSubmit}  />
+          <NewPostForm onPostSubmit={handlePostSubmit} onClose={closeForm} />
           
         </Box>
       </Slide>
