@@ -14,16 +14,26 @@ export async function createPost(post: Post) {
     });
 
     if (!response.ok) {
-      throw new Error('投稿に失敗しました');
+      const text = await response.text();
+      console.log("hello");
+      throw new Error(`エラー: ${response.status} ${response.statusText} - ${text}`);
+      
     }
 
-    const createdPost = await response.json();  // 作成された投稿データを取得
+    const part = await response.json();  // 作成された投稿データを取得
+    console.log("part=",part)
+
+    if (part== "yes\n"){
+      alert("不適切！")
+      console.log("不適切です")
+    }
+    
 
     // POSTが成功した後、GETリクエストを実行して投稿一覧を取得
     const posts = await getPosts();  // getPosts関数を呼び出して投稿一覧を取得
     console.log('取得した投稿データ:', posts);  // 取得した投稿データを表示
 
-    return { createdPost, posts };  // 作成した投稿と、全ての投稿データを返す
+    return { posts };  // 作成した投稿と、全ての投稿データを返す
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new Error(error.message);

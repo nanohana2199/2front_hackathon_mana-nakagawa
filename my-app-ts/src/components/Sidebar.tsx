@@ -1,6 +1,6 @@
 // src/components/Sidebar.tsx
 import React from 'react';
-import { Box, Typography, Divider, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
+import { Box, Divider, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -17,16 +17,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
 
   return (
     <Box sx={{ width: drawerWidth, p: 2 }}>
-      
       <Divider />
       <List>
-  <ListItem disablePadding>
-    <ListItemButton onClick={() => handleItemClick('プロフィール設定')}>
-      <ListItemText primary="プロフィール設定" />
-    </ListItemButton>
-  </ListItem>
-</List>
-
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => handleItemClick('ログアウト')}>
+            <ListItemText primary="ログアウト" />
+          </ListItemButton>
+        </ListItem>
+      </List>
     </Box>
   );
 };

@@ -16,8 +16,10 @@ const HomePage: React.FC = () => {
     setIsFormOpen(!isFormOpen);
   };
 
-  const handleFormClose = () => {
-    setIsFormOpen(false);
+  
+
+  const handlePostSubmit = () => {
+    setIsFormOpen(false); // 投稿完了後にフォームを閉じる
   };
 
   return (
@@ -65,14 +67,8 @@ const HomePage: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             新規投稿作成
           </Typography>
-          <NewPostForm />
-          <Button
-            variant="text"
-            onClick={handleFormClose}
-            sx={{ mt: 2, color: 'gray' }}
-          >
-            閉じる
-          </Button>
+          <NewPostForm onPostSubmit={handlePostSubmit}  />
+          
         </Box>
       </Slide>
     </Box>

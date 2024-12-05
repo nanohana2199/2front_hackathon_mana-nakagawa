@@ -4,6 +4,7 @@ import SidebarComponent from './SidebarComponent';
 import PostItemMain from './PostItemMain';
 import useCurrentUser from '../hooks/useCurrentUser';
 import { createReply, getReplies } from '../api/reply';
+import { useNavigate } from 'react-router-dom';
 
 interface Reply {
   id: number;
@@ -24,6 +25,20 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
   const [isReplying, setIsReplying] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [replies, setReplies] = useState<Reply[]>([]);
+  const navigate = useNavigate(); // useNavigate を使用
+
+
+  const handleLogout = () => {
+    console.log('ログアウト処理を実行します');
+    try {
+      // 必要な処理があればここに追加
+      navigate('/'); // リダイレクト
+      console.log('リダイレクトしました'); // リダイレクト後にログを表示
+    } catch (error) {
+      console.error('ログアウト処理中にエラーが発生:', error);
+    }
+  };
+  
 
   // リプライを取得
   const fetchReplies = async () => {
@@ -69,8 +84,14 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
       <SidebarComponent
         mobileOpen={mobileOpen}
         handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
-        onItemSelect={(item) => console.log(`選択された項目: ${item}`)}
-      />
+        onItemSelect={(item) => {
+         console.log(`選択された項目: ${item}`);
+         if (item === 'ログアウト') {
+           handleLogout(); // ログアウト処理を呼び出す
+         }
+       }}
+    />
+
       {/* メインコンテンツ */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         {/* 投稿の内容 */}

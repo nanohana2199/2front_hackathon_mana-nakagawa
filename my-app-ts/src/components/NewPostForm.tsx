@@ -2,7 +2,11 @@
 import React, { useState } from 'react';
 import { createPost } from '../api/post'; // api.tsからインポート
 
-const NewPostForm: React.FC = () => {
+interface NewPostFormProps {
+  onPostSubmit?: () => void; // 投稿完了時のコールバック
+}
+
+const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit }) => {
   const [content, setContent] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -29,10 +33,17 @@ const NewPostForm: React.FC = () => {
   
       // 投稿送信後の処理（UI更新やリダイレクトなど）
       console.log('投稿が成功しました:', createdPost);
+
+      // 投稿完了時に親コンポーネントに通知
+      if (onPostSubmit) {
+        onPostSubmit();
+      }
+
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setErrorMessage(error.message); // Errorインスタンスの場合はそのメッセージを表示
-      } else {
+        // エラーメッセージ（誹謗中傷エラーを含む）を表示
+        setErrorMessage(error.message);
+      }  else {
         setErrorMessage('予期しないエラーが発生しました'); // 型が異なる場合のエラーハンドリング
       }
     } finally {
