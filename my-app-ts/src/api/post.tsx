@@ -25,6 +25,7 @@ export async function createPost(post: Post) {
     if (part== "yes\n"){
       alert("不適切！")
       console.log("不適切です")
+      return;
     }
     
 
