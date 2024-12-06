@@ -91,18 +91,18 @@ const ProfileSetupPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 600, mx: 'auto' }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+    <Box sx={{ p: 3, maxWidth: 600, mx: 'auto'}}>
+      <Typography variant="h4" sx={{ mb: 3 ,textAlign: 'center'}}>
         プロフィール設定
       </Typography>
       {/* プロフィール画像のアップロード */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 ,justifyContent: 'center',flexDirection: 'column'}}>
         <Avatar
           src={profileImage || '/default-avatar.png'}
           alt="Profile Image"
-          sx={{ width: 80, height: 80, mr: 2 }}
+          sx={{ width: 200, height: 200, mr: 2 }}
         />
-        <IconButton component="label">
+        <IconButton component="label" sx={{ textAlign: 'center' }}>
           <Typography variant="body2">画像を変更</Typography>
           <input
             id="file-input"

@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
   return (
     <Box sx={{ width: drawerWidth, p: 2 }}>
       <Divider />
-      <List>
+      <List sx={{ marginTop: 4 }}>
         {/* プロフィール設定ボタン */}
         <ListItem disablePadding>
           <ListItemButton onClick={() => handleItemClick('プロフィール設定')}>

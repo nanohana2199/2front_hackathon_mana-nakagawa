@@ -1,5 +1,6 @@
 export async function likePost(postId: number, userId: string) {
   const apiBaseURL = process.env.REACT_APP_BASE_URL;
+  
 
   try {
     console.log('User ID:', userId); // userId が正しい Firebase UID になっているか確認

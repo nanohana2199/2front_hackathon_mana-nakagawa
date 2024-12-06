@@ -3,6 +3,7 @@ import { User } from "../types/user";
 // ユーザーを作成する関数
 export async function createUser(user: User) {
   const apiBaseURL = process.env.REACT_APP_BASE_URL;
+  console.log(apiBaseURL);
 
   try {
     const response = await fetch(apiBaseURL + '/users', {
