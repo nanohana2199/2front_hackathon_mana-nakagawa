@@ -22,10 +22,18 @@ export async function createReply(replyData: { content: string; postId: number; 
           const text = await response.text();
           errorMessage = text || errorMessage;
         }
+
+         // 不適切なコンテンツの場合の特別な処理
+         if (response.status === 400) {
+          alert('不適切な内容が検出されました。');
+          return { success: false, message: '不適切な内容が検出されました。' };
+        }
+        
         throw new Error(errorMessage);
       }
 
       const data = await response.json();
+
       return { success: true, message: data.message };
     } catch (error: unknown) {
       if (error instanceof Error) {

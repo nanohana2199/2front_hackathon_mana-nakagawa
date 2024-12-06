@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "term6-mana-nakagawa",
+    "firebase use development": "term6-mana-nakagawa"
+  },
+  "targets": {},
+  "etags": {}
+}
