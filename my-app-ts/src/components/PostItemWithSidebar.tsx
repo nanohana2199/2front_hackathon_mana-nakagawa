@@ -1,50 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import SidebarComponent from './SidebarComponent';
 import PostItemMain from './PostItemMain';
 import useCurrentUser from '../hooks/useCurrentUser';
 import { createReply, getReplies } from '../api/reply';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+
 
 interface Reply {
   id: number;
   content: string;
   userName?: string; // ユーザー名（任意）
+  user_id:string;
+  userAvatar?: string;
 }
 
 interface PostItemWithSidebarProps {
   post: {
     id: number;
     content: string;
+    author: string; // 新規追加
+    user_id :string;
+
+
   };
   replies: any[]; // これを追加
 }
 
 const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
   const user_id = useCurrentUser();
+  const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const [isReplying, setIsReplying] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [replies, setReplies] = useState<Reply[]>([]);
   const navigate = useNavigate(); // useNavigate を使用
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (user_id !== undefined) {
+      // user_id が判明したらローディングを終了
+      setIsLoading(false);
+    }
+  }, [user_id]);
 
   const handleLogout = () => {
     console.log('ログアウト処理を実行します');
     try {
-      // 必要な処理があればここに追加
       navigate('/'); // リダイレクト
       console.log('リダイレクトしました'); // リダイレクト後にログを表示
     } catch (error) {
       console.error('ログアウト処理中にエラーが発生:', error);
     }
   };
-  
 
   // リプライを取得
   const fetchReplies = async () => {
     try {
       const fetchedReplies = await getReplies(post.id);
-      setReplies(fetchedReplies || []); // 空配列フォールバック
+      console.log('Fetched replies:', fetchedReplies);
+
+      const repliesWithAvatars = await Promise.all(
+        (fetchedReplies || []).map(async (reply: Reply) => {
+          const docRef = doc(db, 'users', reply.user_id);
+          const docSnap = await getDoc(docRef);
+          const userAvatar = docSnap.exists()
+            ? docSnap.data().profileImage || '/images/default-avatar.png'
+            : '/images/default-avatar.png';
+          return { ...reply, userAvatar };
+        })
+      );
+
+      console.log('Replies with avatars:', repliesWithAvatars);
+
+      setReplies(repliesWithAvatars|| []); // 空配列フォールバック
     } catch (error) {
       console.error('リプライの取得に失敗しました:', error);
     }
@@ -67,13 +97,44 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
     fetchReplies();
   }, [post.id]);
 
-  // ログインしていない場合
-  if (!user_id) {
+  // ユーザーアバターを取得
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      if (!post.user_id || post.user_id === 'default_user_id') {
+        console.warn('Invalid or default user ID:', post.user_id);
+        setUserAvatar('/default-avatar.png'); // デフォルト画像を設定
+        return;
+      }
+
+      console.log('Fetching avatar for user ID:', post.user_id); // デバッグログ
+
+      try {
+        const docRef = doc(db, 'users', post.user_id); // Firestoreでuser_idを使用
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const profileImage = docSnap.data().profileImage || '/default-avatar.png';
+          console.log('Fetched profile image:', profileImage);
+          setUserAvatar(profileImage);
+        } else {
+          console.warn('No document found for user ID:', post.user_id);
+          setUserAvatar('/default-avatar.png'); // デフォルトにフォールバック
+        }
+      } catch (error) {
+        console.error('ユーザーアバターの取得に失敗しました:', error);
+        setUserAvatar('/default-avatar.png'); // デフォルトにフォールバック
+      }
+    };
+
+    fetchUserAvatar();
+  }, [post.user_id]);
+
+  // 条件付きでコンテンツを表示
+  if (isLoading) {
     return (
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h6" color="error">
-          ユーザーがログインしていません
-        </Typography>
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <CircularProgress />
+        
       </Box>
     );
   }
@@ -85,21 +146,23 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
         mobileOpen={mobileOpen}
         handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
         onItemSelect={(item) => {
-         console.log(`選択された項目: ${item}`);
-         if (item === 'ログアウト') {
-           handleLogout(); // ログアウト処理を呼び出す
-         }
-       }}
-    />
+          console.log(`選択された項目: ${item}`);
+          if (item === 'ログアウト') {
+            handleLogout(); // ログアウト処理を呼び出す
+          }
+        }}
+      />
 
       {/* メインコンテンツ */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        {/* 投稿の内容 */}
         <PostItemMain
           postContent={post.content}
           postId={post.id}
           userId={user_id}
           replies={replies}
+          author={post.author} // 追加
+          authorUserId ={post.user_id}
+          userAvatar={userAvatar} // アバターを渡す
           onReplySubmit={handleReplySubmit}
         />
       </Box>

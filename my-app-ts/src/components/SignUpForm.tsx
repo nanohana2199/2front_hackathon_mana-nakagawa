@@ -13,6 +13,7 @@ import {
   Box,
   Stack,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 
 const SignUpForm = () => {
@@ -22,6 +23,7 @@ const SignUpForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // ローディング状態を追加
   const navigate = useNavigate();
 
   const handleFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -48,6 +50,9 @@ const SignUpForm = () => {
       setErrorMessage("すべての項目を入力してください。");
       return;
     }
+
+    setIsLoading(true); // ローディング開始
+    setErrorMessage(""); // エラーメッセージのリセット
 
     try {
       const storageRef = ref(storage, `images/${file.name}`);
@@ -79,6 +84,8 @@ const SignUpForm = () => {
     } catch (error) {
       console.error("Error during sign up:", error);
       setErrorMessage("サインアップに失敗しました。");
+    }finally {
+      setIsLoading(false); // ローディング終了
     }
   };
 
@@ -153,8 +160,15 @@ const SignUpForm = () => {
               />
             </Button>
           </div>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            登録
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isLoading} // ローディング中は無効化
+            startIcon={isLoading && <CircularProgress size={20} />} // スピナーを追加
+          >
+            {isLoading ? "登録中..." : "登録"}
           </Button>
         </Stack>
       </form>

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Typography, Button, List, ListItem, ListItemText,Avatar } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
 
 interface RepliesToggleSectionProps {
   replies: any[];
@@ -10,9 +13,18 @@ const RepliesToggleSection: React.FC<RepliesToggleSectionProps> = ({ replies }) 
 
   return (
     <Box>
-      {/* 返信を表示ボタン */}
-      <Button onClick={() => setShowReplies(!showReplies)} sx={{ mb: 2 }}>
-        {showReplies ? '他の返信を非表示' : '他の返信を表示'}
+       {/* 返信を表示ボタン */}
+       <Button
+        onClick={() => setShowReplies(!showReplies)}
+        sx={{
+          mb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        startIcon={showReplies ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+      >
+        {showReplies ? '非表示' : `返信 (${replies.length})`}
       </Button>
 
       {/* リプライ表示 */}
@@ -22,9 +34,15 @@ const RepliesToggleSection: React.FC<RepliesToggleSectionProps> = ({ replies }) 
             <List>
               {replies.map((reply, index) => (
                 <ListItem key={index} alignItems="flex-start">
+                  {/* アバター画像 */}
+                  <Avatar
+                    src={reply.userAvatar || '/images/default-avatar.png'}
+                    alt="Reply User Avatar"
+                    sx={{ width: 40, height: 40, mr: 2 }}
+                  />
                   <ListItemText
-                    primary={reply.content}
-                    secondary={reply.userName || '匿名ユーザー'}
+                    primary={reply.author || '匿名ユーザー'}
+                    secondary={reply.content}
                   />
                 </ListItem>
               ))}

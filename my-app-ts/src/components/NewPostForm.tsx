@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createPost } from '../api/post'; // api.tsからインポート
 import { Box, TextField, Button, Typography, CircularProgress, Alert, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import useCurrentUser from "../hooks/useCurrentUser";
 
 interface NewPostFormProps {
   onPostSubmit?: () => void; // 投稿完了時のコールバック
@@ -14,6 +15,8 @@ const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit, onClose }) => 
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+  const userId = useCurrentUser(); // 現在のユーザーIDを取得
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
@@ -24,9 +27,9 @@ const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit, onClose }) => 
     }
   
     setIsSubmitting(true);  // 投稿処理中の状態にする
-  
+    
     // 新規投稿データ
-    const postData = { content };
+    const postData = { content,user_id: userId, };
   
     try {
       const createdPost = await createPost(postData); // createPost関数を呼び出す

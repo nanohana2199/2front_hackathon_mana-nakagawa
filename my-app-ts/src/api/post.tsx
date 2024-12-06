@@ -15,7 +15,6 @@ export async function createPost(post: Post) {
 
     if (!response.ok) {
       const text = await response.text();
-      console.log("hello");
       throw new Error(`エラー: ${response.status} ${response.statusText} - ${text}`);
       
     }

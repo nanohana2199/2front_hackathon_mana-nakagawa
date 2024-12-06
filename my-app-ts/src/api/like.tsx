@@ -50,3 +50,27 @@ export async function getLikeCount(postId:number) {
   }
 }
 
+export async function checkIfLiked(postId: number, userId: string) {
+  const apiBaseURL = process.env.REACT_APP_BASE_URL;
+
+  try {
+    const response = await fetch(`${apiBaseURL}/posts/${postId}/like/status?user_id=${userId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Error response from server:', text);
+      throw new Error(`いいねステータスの取得に失敗しました: ${text}`);
+    }
+
+    const data = await response.json(); // サーバーからのステータスを取得
+    return data.liked; // ユーザーがいいねしているかどうかを返す
+  } catch (error) {
+    console.error('いいねステータスの取得でエラー:', error);
+    throw new Error('いいねステータスの取得に失敗しました');
+  }
+}

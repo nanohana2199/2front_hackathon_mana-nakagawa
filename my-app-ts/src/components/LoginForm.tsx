@@ -11,6 +11,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
 
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -19,6 +20,10 @@ const LoginForm = () => {
         throw new Error("メールアドレスとパスワードを入力してください。");
       }
       await signInWithEmailAndPassword(auth, trimmedEmail, password);
+
+  const currentTime = new Date().getTime(); // 現在時刻のタイムスタンプを取得
+  localStorage.setItem("loginTime", currentTime.toString()); // localStorageに保存
+  
       navigate("/home");
     } catch (error) {
       if (error instanceof Error) {
