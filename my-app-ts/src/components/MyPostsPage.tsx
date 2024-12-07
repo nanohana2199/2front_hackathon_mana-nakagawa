@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import PostList from './PostList';
 import {
-  Box, Avatar, Typography, CircularProgress, Divider, Paper, useMediaQuery
+  Box,
+  Avatar,
+  Typography,
+  CircularProgress,
+  Divider,
+  Paper,
+  useMediaQuery
 } from '@mui/material';
 import SidebarComponent from './SidebarComponent';
+import useCurrentUser from '../hooks/useCurrentUser';
 
 interface UserDetails {
   profileImage: string;
@@ -14,21 +21,19 @@ interface UserDetails {
   bio: string;
 }
 
-const drawerWidth = 240; // サイドバーの幅
+const drawerWidth = 240;
 
-const UserProfile: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
+const MyPostsPage: React.FC = () => {
+  const user_id = useCurrentUser();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 800px)'); // モバイル判定
+  const isMobile = useMediaQuery('(max-width: 800px)');
 
   const handleLogout = () => {
-    console.log('ログアウト処理を実行します');
     try {
-      navigate('/'); // リダイレクト
-      console.log('リダイレクトしました');
+      navigate('/');
     } catch (error) {
       console.error('ログアウト処理中にエラーが発生:', error);
     }
@@ -36,14 +41,12 @@ const UserProfile: React.FC = () => {
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      if (!userId) return;
+      if (!user_id) return;
       try {
-        const docRef = doc(db, 'users', userId);
+        const docRef = doc(db, 'users', user_id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          console.log('Firestoreから取得したデータ:', docSnap.data());
           const data = docSnap.data() as UserDetails;
-
           setUserDetails({
             profileImage: data.profileImage || '/images/default-avatar.png',
             backgroundImage: data.backgroundImage || '/images/default-background.png',
@@ -60,7 +63,7 @@ const UserProfile: React.FC = () => {
     };
 
     fetchUserDetails();
-  }, [userId]);
+  }, [user_id]);
 
   if (loading) {
     return (
@@ -86,18 +89,15 @@ const UserProfile: React.FC = () => {
         mobileOpen={mobileOpen}
         handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
         onItemSelect={(item) => {
-          console.log(`選択された項目: ${item}`);
           if (item === 'ログアウト') {
             handleLogout();
           }
         }}
       />
-      {/* メインコンテンツ領域 */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          // isMobileがtrueなら0、falseならdrawerWidth分左にスペース
           marginLeft: isMobile ? 0 : `${drawerWidth}px`,
           display: 'flex',
           flexDirection: 'column',
@@ -132,7 +132,7 @@ const UserProfile: React.FC = () => {
             />
             <Box sx={{ mt: 2 }}>
               <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                プロフィール
+                あなたの投稿
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                 {userDetails.bio || '自己紹介文はありません。'}
@@ -144,19 +144,12 @@ const UserProfile: React.FC = () => {
         <Divider sx={{ mb: 2, width: '100%', maxWidth: 800 }} />
 
         {/* 投稿一覧エリア */}
-        <Box sx={{ width: '100%', maxWidth: 800,display: 'flex' ,justifyContent: 'center'}}>
-          {/* <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-            投稿一覧
-          </Typography> */}
-
-   
-          <PostList userId={userId} />
-     
-
+        <Box sx={{ width: '100%', maxWidth: 800, display: 'flex', justifyContent: 'center'}}>
+          <PostList userId={user_id || ''}showDeleteButton={true} />
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default UserProfile;
+export default MyPostsPage;

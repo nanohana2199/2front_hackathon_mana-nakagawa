@@ -21,7 +21,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   onItemSelect,
   drawerWidth = 240,
 }) => {
-  const isMobile = useMediaQuery('(max-width: 600px)'); // モバイル判定
+  const isMobile = useMediaQuery('(max-width: 800px)'); // モバイル判定
   const navigate = useNavigate();
   const handleItemClick = (item: string) => {
     if (item === 'ホーム') {

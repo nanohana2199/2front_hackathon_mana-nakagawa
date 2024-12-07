@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, IconButton, Button, Divider } from '@mui/material';
+import { Box,
+  Typography,
+  IconButton,
+  Divider,
+  Button,
+  Avatar,
+  Card,
+  CardHeader,
+  CardContent,
+  TextField, Dialog, DialogTitle, DialogContent, DialogActions,} from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import LikeButton from './LikeButton';
 import RepliesToggleSection from './RepliesToggleSection';
 import UserBioModal from './UserBioModal';
 import { useNavigate } from 'react-router-dom'; // useNavigateをインポート
 import { useMediaQuery } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Reply {
   id: number;
@@ -25,6 +35,7 @@ interface PostItemMainProps {
   created_at:string;
   onReplySubmit: (content: string) => void;
   onAvatarClick: (userId: string) => void;
+  onDelete?: () => void; // 追加
 }
 
 const PostItemMain: React.FC<PostItemMainProps> = ({
@@ -37,15 +48,16 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
   userAvatar,
   created_at,
   onReplySubmit,
-  onAvatarClick
+  onAvatarClick,
+  onDelete
 }) => {
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replyContent, setReplyContent] = useState<string>('');
   const [isBioModalOpen, setIsBioModalOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null); // モーダルに渡すユーザーID
   const navigate = useNavigate(); // useNavigateを初期化
-  const isMobile = useMediaQuery('(max-width: 600px)'); // モバイル判定
-  
+  const isMobile = useMediaQuery('(max-width: 800px)'); // モバイル判定
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
 
   const handleReplySubmit = () => {
@@ -68,86 +80,126 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
   
 
   return (
-    <Box sx={{ maxWidth: '600px', mx: 'auto', pb: 2,marginLeft: isMobile ? 0 :'240px'}}>
-    {/* 投稿内容 */}
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-  {/* ユーザー情報 */}
-  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    <img
-      src={userAvatar || '/images/default-avatar.png'}
-      alt="User Avatar"
-      style={{ width: 50, height: 50, borderRadius: '50%' }}
-      onError={(e) => {
-        console.warn('Failed to load avatar:', userAvatar);
-        e.currentTarget.src = '/images/default-avatar.png'; // 明示的にデフォルト画像を設定
+    // <Box sx={{ maxWidth: '600px', mx: 'auto', pb: 2, ml: isMobile ? 0 : '240px' sx={{
+      <Box>
+      <Card variant="outlined" sx={{ mb: 2, borderRadius: 2, boxShadow: 1, minWidth:'400px'}}>
+        <CardHeader
+          avatar={
+            <Avatar
+              src={userAvatar || '/images/default-avatar.png'}
+              alt="User Avatar"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement; // 型アサーションを追加
+                console.warn('Failed to load avatar:', userAvatar);
+                target.src = '/images/default-avatar.png'; // 明示的にデフォルト画像を設定
+              }}
+              onClick={() => onAvatarClick(authorUserId)}
+              sx={{ cursor: 'pointer' }}
+            />
+          }
+          title={
+            <Typography variant="h6" component="div">
+              {author}
+            </Typography>
+          }
+          subheader={
+            <Typography variant="body2" color="text.secondary">
+              {formatDate(created_at)}
+            </Typography>
+          }
+          sx={{ pb: 0 }}
+        />
+        <CardContent sx={{ pt: 0 }}>
+          <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
+            {postContent}
+          </Typography>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
+            <LikeButton post_id={postId} user_id={userId || ''} />
+            <IconButton
+              onClick={() => setIsReplying(!isReplying)}
+              sx={{
+                ml: 2,
+                color: isReplying ? 'primary.main' : 'text.secondary',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              <ChatBubbleOutlineIcon sx={{ fontSize: '16px' }} />
+            </IconButton>
+            {/* 削除ボタン: ユーザーがオーナーの場合のみ表示などの条件分岐しても良い */}
+            {onDelete && (
+  <Box sx={{ ml: 2 }}>
+    <Button
+      variant="contained"
+      color="error"
+      size="small"
+      startIcon={<DeleteIcon />}
+      onClick={() => setShowConfirmDelete(true)} // モーダル表示用
+      sx={{
+        '&:hover': {
+          backgroundColor: 'error.dark',
+          transform: 'scale(1.05)',
+          transition: 'transform 0.2s ease',
+        },
       }}
-      onClick={() => onAvatarClick(authorUserId)} // アロー関数でuserIdを渡す
-    />
-    <Typography variant="h6" gutterBottom sx={{ ml: 2 }}>
-      {author} {/* 投稿者名をアバターのすぐ右に表示 */}
-    </Typography>
-  </Box>
+    >
+      削除
+    </Button>
 
-  {/* 作成日時 */}
-  <Typography variant="body2" color="textSecondary">
-    {formatDate(created_at)} {/* 作成日をフォーマット */}
-  </Typography>
-</Box>
-
-        {/* コンテンツ部分 */}
-    <Box sx={{ pl: 8, mt: 1 }}> {/* 左側にスペースを追加 */}
-      <Typography variant="body1" gutterBottom>
-        {postContent}
-      </Typography>
-    </Box>
-      
-      <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', p: 1 }}>
-        <LikeButton post_id={postId} user_id={userId || ''} />
-        <IconButton
-          onClick={() => setIsReplying(!isReplying)}
-          sx={{
-            color: isReplying ? 'blue' : 'gray',
-            transition: 'color 0.2s ease',
-            ml: 2,
-          }}
-        >
-          <ChatBubbleOutlineIcon sx={{ fontSize: '16px' }} />
-        </IconButton>
-      </Box>
-
-      {/* 返信作成フォーム */}
-      {isReplying && (
-        <Box >
-          <textarea
-            placeholder="コメントする"
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            style={{
-              width: '100%',
-              height: '100px',
-              padding: '8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          />
-           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-          <Button onClick={handleReplySubmit} >
-            返信
+    {/* モーダル部分 */}
+    {showConfirmDelete && (
+      <Dialog open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)}>
+        <DialogTitle>削除の確認</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            本当にこの投稿を削除しますか？ この操作は元に戻せません。
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowConfirmDelete(false)} color="primary">
+            キャンセル
           </Button>
+          <Button
+            onClick={() => {
+              onDelete();
+              setShowConfirmDelete(false);
+            }}
+            color="error"
+            variant="contained"
+          >
+            削除する
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )}
+  </Box>
+)}
           </Box>
-          
-        </Box>
-      )}
 
-      {/* リプライ表示 */}
-      <RepliesToggleSection replies={replies} />
+          {isReplying && (
+            <Box sx={{ mt: 2 }}>
+              <TextField
+                placeholder="コメントする"
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                multiline
+                rows={3}
+                fullWidth
+                variant="outlined"
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                <Button variant="contained" onClick={handleReplySubmit}>
+                  返信
+                </Button>
+              </Box>
+            </Box>
+          )}
 
-      </Box>
-
-      {/* 横線で仕切り */}
-      <Divider />
-    </Box>   
+          <RepliesToggleSection replies={replies} />
+        </CardContent>
+        <Divider />
+      </Card>
+    </Box> 
     
   );
 };
