@@ -23,13 +23,16 @@ interface PostItemWithSidebarProps {
     content: string;
     author: string; // 新規追加
     user_id :string;
+    created_at :string;
 
 
   };
   replies: any[]; // これを追加
+  
+  onAvatarClick: (userId: string) => void; // 新しいプロップ
 }
 
-const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
+const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvatarClick }) => {
   const user_id = useCurrentUser();
   const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const [isReplying, setIsReplying] = useState(false);
@@ -53,6 +56,15 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
     } catch (error) {
       console.error('ログアウト処理中にエラーが発生:', error);
     }
+  };
+
+  const handleAvatarClick = (userId: string) => {
+    if (!userId) {
+      console.warn('無効なユーザーIDです');
+      return;
+    }
+  
+    navigate(`/user/${userId}`); // プロフィールページへ遷移
   };
 
   // リプライを取得
@@ -138,6 +150,8 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
       </Box>
     );
   }
+ 
+
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -154,7 +168,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
       />
 
       {/* メインコンテンツ */}
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%' }}>
         <PostItemMain
           postContent={post.content}
           postId={post.id}
@@ -162,8 +176,10 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post }) => {
           replies={replies}
           author={post.author} // 追加
           authorUserId ={post.user_id}
+          created_at={post.created_at}
           userAvatar={userAvatar} // アバターを渡す
           onReplySubmit={handleReplySubmit}
+          onAvatarClick={handleAvatarClick}
         />
       </Box>
     </Box>

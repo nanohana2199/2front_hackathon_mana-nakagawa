@@ -55,9 +55,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({ post_id, user_id }) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <IconButton onClick={handleLike} disabled={liked}>
-        <FavoriteIcon style={{ color: liked ? 'red' : 'gray' }} />
+        <FavoriteIcon style={{ color: liked ? 'red' : 'gray', fontSize: '16px' }} />
       </IconButton>
-      <span>{likeCount}</span> {/* いいね数を表示 */}
+      <span style={{ fontSize: '12px', lineHeight: '1.5', color: '#555' }}>{likeCount}</span> {/* いいね数を表示 */}
     </div>
   );
 };

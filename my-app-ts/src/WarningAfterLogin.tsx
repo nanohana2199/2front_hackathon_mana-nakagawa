@@ -5,33 +5,32 @@ const WarningAfterLogin = () => {
   const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
-    // ログイン時刻を取得
     const loginTime = localStorage.getItem("loginTime");
     console.log("loginTime:", loginTime);
 
     if (loginTime) {
       const loginTimestamp = parseInt(loginTime, 10);
       const currentTime = new Date().getTime();
+      const thirtySeconds = 30 * 1000; // 30秒のミリ秒
+      const initialDelay = thirtySeconds - ((currentTime - loginTimestamp) % thirtySeconds);
 
-      // 2分（120秒）のミリ秒を計算
-      const oneMinutes = 1 * 60 * 1000;
+      console.log("initialDelay:", initialDelay);
 
-      // 残り時間を計算
-      const remainingTime = oneMinutes - (currentTime - loginTimestamp);
-      console.log("remainingTime:", remainingTime);
-
-      if (remainingTime > 0) {
-        // 残り時間後に警告を表示
-        const timer = setTimeout(() => {
-          setShowWarning(true);
-        }, remainingTime);
-
-        // クリーンアップ
-        return () => clearTimeout(timer);
-      } else {
-        // すでに2分経過していた場合は即座に警告表示
+      // 初回の警告タイマーを設定
+      const initialTimer = setTimeout(() => {
         setShowWarning(true);
-      }
+
+        // 以降は30秒ごとに警告を表示
+        const interval = setInterval(() => {
+          setShowWarning(true);
+        }, thirtySeconds);
+
+        // クリーンアップ処理
+        return () => clearInterval(interval);
+      }, initialDelay);
+
+      // クリーンアップ処理
+      return () => clearTimeout(initialTimer);
     }
   }, []);
 
@@ -41,44 +40,33 @@ const WarningAfterLogin = () => {
 
   return (
     <div>
-       <Slide direction="down" in={showWarning} mountOnEnter unmountOnExit>
-        <Alert 
-          severity="warning" 
-          onClose={closeWarning} 
+      <Slide direction="down" in={showWarning} mountOnEnter unmountOnExit>
+        <Alert
+          severity="warning"
+          onClose={closeWarning}
           sx={{
             position: "fixed",
             top: 0,
             left: 0,
             right: 0,
-            zIndex: 1200,
+            zIndex: 1400,
+            fontSize: "2rem",
+            padding: "20px",
+            textAlign: "center",
+            fontWeight: "bold",
+            boxShadow: "0 0 20px rgba(255, 0, 0, 0.8)",
+            border: "2px solid #fff",
+            justifyContent: "center",
+            lineHeight: 1.5,
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          2分が経過しました。少し休憩しましょう
+          30秒が経過しました。少し休憩しましょう
         </Alert>
       </Slide>
     </div>
   );
-};
-
-const styles = {
-  warningOverlay: {
-    position: "fixed" as "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  warningBox: {
-    backgroundColor: "white",
-    padding: "20px",
-    borderRadius: "8px",
-    textAlign: "center" as "center",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.3)",
-  },
 };
 
 export default WarningAfterLogin;

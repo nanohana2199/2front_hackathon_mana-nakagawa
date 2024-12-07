@@ -8,6 +8,8 @@ import React, { useEffect, useState } from "react";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import WarningAfterLogin from "./WarningAfterLogin"; // 新しく追加
+import PostList from './components/PostList';
+import UserProfile from './components/UserProfile';
 
 // テーマを作成
 const theme = createTheme({
@@ -35,6 +37,9 @@ function App() {
               <Route path="/signup" element={<SignUpForm />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/profile" element={<ProfileSetupPage />} />
+              {/* 投稿リストとユーザープロファイル */}
+              <Route path="/posts" element={<PostList />} />
+              <Route path="/user/:userId" element={<UserProfile />} />
               
             </Routes>
           </div>

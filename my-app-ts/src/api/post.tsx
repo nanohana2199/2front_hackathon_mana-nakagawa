@@ -44,11 +44,13 @@ export async function createPost(post: Post) {
 }
 
 // 新しく追加したGETリクエストのコード
-export async function getPosts() {
+export async function getPosts(userId?: string) {
   const apiBaseURL = process.env.REACT_APP_BASE_URL;
 
   try {
-    const response = await fetch(`${apiBaseURL}/posts`, {
+    const url = userId ? `${apiBaseURL}/posts?userId=${userId}` : `${apiBaseURL}/posts`;
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

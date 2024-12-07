@@ -14,7 +14,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
   const handleItemClick = (item: string) => {
     if (item === 'プロフィール設定') {
       navigate('/profile'); // プロフィール設定ページに遷移
-    } else if (item === 'ログアウト') {
+    } else if (item === 'ホーム') {
+      navigate('/home'); // ホームページに遷移
+    }else if (item === 'ログアウト') {
       if (onItemSelect) {
         onItemSelect(item); // ログアウトなど、別の処理を通知
       }
@@ -25,6 +27,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
     <Box sx={{ width: drawerWidth, p: 2 }}>
       <Divider />
       <List sx={{ marginTop: 4 }}>
+
+        {/* ホームボタン */}
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => handleItemClick('ホーム')}>
+            <ListItemText primary="ホーム" />
+          </ListItemButton>
+        </ListItem>
         {/* プロフィール設定ボタン */}
         <ListItem disablePadding>
           <ListItemButton onClick={() => handleItemClick('プロフィール設定')}>
