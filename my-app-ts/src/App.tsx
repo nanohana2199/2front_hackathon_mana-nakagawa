@@ -10,6 +10,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import WarningAfterLogin from "./WarningAfterLogin"; // 新しく追加
 import PostList from './components/PostList';
 import UserProfile from './components/UserProfile';
+import MyPostsPage from './components/MyPostsPage'; // 新規追加
 
 // テーマを作成
 const theme = createTheme({
@@ -40,7 +41,7 @@ function App() {
               {/* 投稿リストとユーザープロファイル */}
               <Route path="/posts" element={<PostList />} />
               <Route path="/user/:userId" element={<UserProfile />} />
-              
+              <Route path="/my-posts" element={<MyPostsPage />} />
             </Routes>
           </div>
         </BrowserRouter>

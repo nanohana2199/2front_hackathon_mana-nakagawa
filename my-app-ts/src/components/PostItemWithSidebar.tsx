@@ -28,11 +28,11 @@ interface PostItemWithSidebarProps {
 
   };
   replies: any[]; // これを追加
-  
+  onDelete?: () => Promise<void>; // ここで onDelete をオプショナルプロパティとして追加
   onAvatarClick: (userId: string) => void; // 新しいプロップ
 }
 
-const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvatarClick }) => {
+const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvatarClick,onDelete }) => {
   const user_id = useCurrentUser();
   const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const [isReplying, setIsReplying] = useState(false);
@@ -153,6 +153,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvata
  
 
 
+  
   return (
     <Box sx={{ display: 'flex' }}>
       {/* サイドバー */}
@@ -180,6 +181,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvata
           userAvatar={userAvatar} // アバターを渡す
           onReplySubmit={handleReplySubmit}
           onAvatarClick={handleAvatarClick}
+          onDelete={onDelete}
         />
       </Box>
     </Box>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
+import ListIcon from '@mui/icons-material/List'; // アイコン例：リストアイコン
 
 
 const drawerWidth = 240;
@@ -20,6 +21,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
       navigate('/profile'); // プロフィール設定ページに遷移
     } else if (item === 'ホーム') {
       navigate('/home'); // ホームページに遷移
+    }else if (item === '自分の投稿') {
+      navigate('/my-posts');
     }else if (item === 'ログアウト') {
       if (onItemSelect) {
         onItemSelect(item); // ログアウトなど、別の処理を通知
@@ -52,6 +55,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onItemSelect }) => {
               <PersonIcon />
             </ListItemIcon>
             <ListItemText primary="プロフィール設定" />
+          </ListItemButton>
+        </ListItem>
+
+         {/* ここに自分の投稿ボタン */}
+         <ListItem disablePadding sx={{ mt: 1 }}>
+          <ListItemButton onClick={() => handleItemClick('自分の投稿')} sx={{
+            borderRadius: 1,
+            '&:hover': { bgcolor: '#e0e0e0' }
+          }}>
+            <ListItemIcon>
+              <ListIcon />
+            </ListItemIcon>
+            <ListItemText primary="自分の投稿" />
           </ListItemButton>
         </ListItem>
 

@@ -81,3 +81,27 @@ export async function getPosts(userId?: string) {
     }
   }
 }
+
+
+export async function deletePost(postId: number) {
+  const apiBaseURL = process.env.REACT_APP_BASE_URL;
+
+  try {
+    const response = await fetch(`${apiBaseURL}/posts/${postId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`エラー: ${response.status} ${response.statusText} - ${text}`);
+    }
+
+    return true; // 成功時
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error('予期しないエラーが発生しました');
+    }
+  }
+}
