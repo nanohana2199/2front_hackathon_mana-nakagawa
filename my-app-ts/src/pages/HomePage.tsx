@@ -1,14 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import PostList from '../components/PostList';
 import NewPostForm from '../components/NewPostForm';
-import { Box, Button, Typography, Slide } from '@mui/material';
+import { Box, Button, Typography, Slide,useMediaQuery } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import {useNavigate } from 'react-router-dom';
+import SidebarComponent from '../components/SidebarComponent';
+
+const drawerWidth = 240;
 
 const HomePage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(true);
   const [elapsedTime, setElapsedTime] = useState<string>('0分'); // 滞在時間の表示用
+  const [mobileOpen, setMobileOpen] = useState(false);
+  
+  const navigate = useNavigate();
   let lastScrollY = 0;
+  const isMobile = useMediaQuery('(max-width: 800px)');
+
+  const handleLogout = () => {
+    console.log('ログアウト処理を実行します');
+    try {
+      navigate('/'); // リダイレクト
+      console.log('リダイレクトしました');
+    } catch (error) {
+      console.error('ログアウト処理中にエラーが発生:', error);
+    }
+  };
 
   useEffect(() => {
     const loginTime = localStorage.getItem('loginTime');
@@ -67,8 +85,30 @@ const HomePage: React.FC = () => {
     setIsFormOpen(false); // 投稿完了後にフォームを閉じる
   };
 
+   
+
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh', p: 2 }}>
+    <Box sx={{ display: 'flex' }}>
+      <SidebarComponent
+        mobileOpen={mobileOpen}
+        handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
+        onItemSelect={(item) => {
+          console.log(`選択された項目: ${item}`);
+          if (item === 'ログアウト') {
+            handleLogout();
+          }
+        }}
+      />
+     {/* メインコンテンツ領域：UserProfileと同様にサイドバーの分だけマージンを取る */}
+     <Box 
+        sx={{ 
+          flexGrow: 1, 
+          marginLeft: isMobile ? 0 : `${drawerWidth}px`, 
+          position: 'relative', 
+          minHeight: '100vh', 
+          p: 2 
+        }}
+      >
       <Slide direction="down" in={showHeader} mountOnEnter unmountOnExit>
         <Box
           sx={{
@@ -82,12 +122,12 @@ const HomePage: React.FC = () => {
             zIndex: 1000,
             boxShadow: 3,
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
           }}
         >
-          <Typography variant="h6">ホームページ</Typography>
-          <Typography variant="body1">滞在時間: {elapsedTime}</Typography>
+          
+          <Typography variant="body1" sx={{ ml: 1 }}>滞在時間: {elapsedTime}</Typography>
         </Box>
       </Slide>
 
@@ -112,6 +152,22 @@ const HomePage: React.FC = () => {
         <AddIcon />
       </Button>
 
+      {/* 背景を暗くするオーバーレイ */}
+      {isFormOpen && (
+        <Box
+          onClick={closeForm} // フォーム外クリックで閉じる
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', // 背景を暗くする
+            zIndex: 998, // フォームより下に配置
+          }}
+        />
+      )}
+
       {/* 新規投稿フォーム（スライドイン） */}
       <Slide direction="up" in={isFormOpen} mountOnEnter unmountOnExit>
         <Box
@@ -120,20 +176,20 @@ const HomePage: React.FC = () => {
             bottom: 0,
             left: 0,
             right: 0,
-            bgcolor: 'background.paper',
-            boxShadow: 4,
-            p: 3,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
+            zIndex: 999, // オーバーレイの上に配置
+            top: '50%',
+            
+           
           }}
         >
           <Typography variant="h6" gutterBottom>
-            新規投稿作成
+            
           </Typography>
           <NewPostForm onPostSubmit={handlePostSubmit} onClose={closeForm} />
         </Box>
       </Slide>
     </Box>
+  </Box>
   );
 };
 

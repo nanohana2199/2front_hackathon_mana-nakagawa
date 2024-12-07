@@ -156,7 +156,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvata
   return (
     <Box sx={{ display: 'flex' }}>
       {/* サイドバー */}
-      <SidebarComponent
+      {/* <SidebarComponent
         mobileOpen={mobileOpen}
         handleDrawerToggle={() => setMobileOpen(!mobileOpen)}
         onItemSelect={(item) => {
@@ -165,7 +165,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvata
             handleLogout(); // ログアウト処理を呼び出す
           }
         }}
-      />
+      /> */}
 
       {/* メインコンテンツ */}
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%' }}>

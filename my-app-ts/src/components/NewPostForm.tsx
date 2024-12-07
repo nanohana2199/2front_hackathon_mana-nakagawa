@@ -1,7 +1,8 @@
 // src/components/NewPostForm.tsx
 import React, { useState } from 'react';
 import { createPost } from '../api/post'; // api.tsからインポート
-import { Box, TextField, Button, Typography, CircularProgress, Alert, IconButton } from '@mui/material';
+import { Box, TextField, Button, Typography, CircularProgress, Alert, IconButton, useMediaQuery,Paper, Divider 
+ } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import useCurrentUser from "../hooks/useCurrentUser";
 
@@ -16,6 +17,8 @@ const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit, onClose }) => 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const userId = useCurrentUser(); // 現在のユーザーIDを取得
+  const isMobile = useMediaQuery('(max-width: 800px)'); // モバイル判定
+  const drawerWidth = isMobile ? 0 : 240; // サイドバーの幅を調整
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,47 +62,76 @@ const NewPostForm: React.FC <NewPostFormProps> = ({ onPostSubmit, onClose }) => 
 
   return (
     <Box 
-     component="form" 
-     onSubmit={handleSubmit}
-     sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        
-      <IconButton
-      onClick={onClose}
-      aria-label="close"
-      sx={{
-        position: 'absolute',
-        top: 8,
-        right: 8,
+      sx={{ 
+        ml: `${drawerWidth}px`, 
+        px: isMobile ? 2 : 4,
+        mt: 2,
+        display: 'flex',
+        justifyContent: 'center'
       }}
     >
-      <CloseIcon />
-      </IconButton>
-      </Box>
-      <TextField
-        multiline
-        rows={4}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Write a post..."
-        variant="outlined"
-        fullWidth
-        disabled={isSubmitting}
-        error={!!errorMessage}
-        helperText={errorMessage}
-      />
-      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
+      <Paper
+        component="form"
+        onSubmit={handleSubmit}
+        elevation={3}
+        sx={{
+          position: 'relative',
+          maxWidth: isMobile ? '100%' : '800px', // モバイルでは全幅、それ以外は800pxに拡張
+          width: '100%',
+          borderRadius: 2,
+          p:4,
+          bgcolor: '#fff',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+         
+          <IconButton
+            onClick={onClose}
+            aria-label="close"
+            sx={{
+              color: 'text.secondary',
+              ml: 'auto',
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+      
+
+        <TextField
+          multiline
+          rows={10}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Write a post..."
+          variant="outlined"
+          fullWidth
           disabled={isSubmitting}
-          startIcon={isSubmitting && <CircularProgress size={20} />}
-        >
-          {isSubmitting ? '投稿中...' : '投稿する'}
-        </Button>
-      </Box>
+          error={!!errorMessage}
+          helperText={errorMessage}
+        />
+
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={20} /> : undefined}
+            sx={{
+              fontWeight: 'bold',
+            }}
+          >
+            {isSubmitting ? '投稿中...' : '投稿する'}
+          </Button>
+        </Box>
+      </Paper>
     </Box>
   );
 };

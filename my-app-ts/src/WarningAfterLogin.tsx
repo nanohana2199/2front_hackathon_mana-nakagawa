@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Slide } from "@mui/material";
+import { Alert, Slide,Box } from "@mui/material";
 
 const WarningAfterLogin = () => {
   const [showWarning, setShowWarning] = useState(false);
@@ -62,7 +62,9 @@ const WarningAfterLogin = () => {
             alignItems: "center",
           }}
         >
-          30秒が経過しました。少し休憩しましょう
+          <Box sx={{ textAlign: "center" }}>
+            30秒が経過しました。少し休憩しましょう
+         </Box>
         </Alert>
       </Slide>
     </div>
