@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, IconButton, Button } from '@mui/material';
+import { Box, Card, CardContent, Typography, IconButton, Button, Divider } from '@mui/material';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import LikeButton from './LikeButton';
 import RepliesToggleSection from './RepliesToggleSection';
 import UserBioModal from './UserBioModal';
+import { useNavigate } from 'react-router-dom'; // useNavigateをインポート
+import { useMediaQuery } from '@mui/material';
 
 interface Reply {
   id: number;
@@ -20,7 +22,9 @@ interface PostItemMainProps {
   authorUserId: string; // 投稿者のユーザーID（新規追加）
   replies: any[];
   userAvatar?: string | null;
+  created_at:string;
   onReplySubmit: (content: string) => void;
+  onAvatarClick: (userId: string) => void;
 }
 
 const PostItemMain: React.FC<PostItemMainProps> = ({
@@ -31,12 +35,17 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
   authorUserId, // 投稿者のユーザーIDを受け取る
   replies,
   userAvatar,
+  created_at,
   onReplySubmit,
+  onAvatarClick
 }) => {
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replyContent, setReplyContent] = useState<string>('');
   const [isBioModalOpen, setIsBioModalOpen] = useState<boolean>(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null); // モーダルに渡すユーザーID
+  const navigate = useNavigate(); // useNavigateを初期化
+  const isMobile = useMediaQuery('(max-width: 600px)'); // モバイル判定
+  
 
 
   const handleReplySubmit = () => {
@@ -47,20 +56,24 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
     }
   };
 
-    // アバターをクリックしたときの処理
-    const handleAvatarClick = (id: string) => {
-      setSelectedUserId(id); // クリックされたアバターのユーザーIDをセット
-      setIsBioModalOpen(true); // モーダルを開く
-    };
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 月は0始まりなので+1
+    const day = date.getDate();
+    return `${year}年${month}月${day}日`;
+  };
+  
 
   
 
   return (
-    <Card sx={{ mb: 2, p: 2, maxWidth: '600px', mx: 'auto' }}>
-      <CardContent>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-  
-  <Box sx={{ mr: 2 }}>
+    <Box sx={{ maxWidth: '600px', mx: 'auto', pb: 2,marginLeft: isMobile ? 0 :'240px'}}>
+    {/* 投稿内容 */}
+    <Box sx={{ p: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+  {/* ユーザー情報 */}
+  <Box sx={{ display: 'flex', alignItems: 'center' }}>
     <img
       src={userAvatar || '/images/default-avatar.png'}
       alt="User Avatar"
@@ -69,12 +82,16 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
         console.warn('Failed to load avatar:', userAvatar);
         e.currentTarget.src = '/images/default-avatar.png'; // 明示的にデフォルト画像を設定
       }}
-      onClick={() => handleAvatarClick(authorUserId)} // アロー関数でuserIdを渡す
+      onClick={() => onAvatarClick(authorUserId)} // アロー関数でuserIdを渡す
     />
+    <Typography variant="h6" gutterBottom sx={{ ml: 2 }}>
+      {author} {/* 投稿者名をアバターのすぐ右に表示 */}
+    </Typography>
   </Box>
-  
-  <Typography variant="h6" gutterBottom sx={{ mr: 2 }}>
-    {author} {/* ユーザー名を表示 */}
+
+  {/* 作成日時 */}
+  <Typography variant="body2" color="textSecondary">
+    {formatDate(created_at)} {/* 作成日をフォーマット */}
   </Typography>
 </Box>
 
@@ -84,7 +101,7 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
         {postContent}
       </Typography>
     </Box>
-      </CardContent>
+      
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', p: 1 }}>
         <LikeButton post_id={postId} user_id={userId || ''} />
         <IconButton
@@ -95,7 +112,7 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
             ml: 2,
           }}
         >
-          <ChatBubbleOutlineIcon />
+          <ChatBubbleOutlineIcon sx={{ fontSize: '16px' }} />
         </IconButton>
       </Box>
 
@@ -126,13 +143,12 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
       {/* リプライ表示 */}
       <RepliesToggleSection replies={replies} />
 
-      {/* Bioモーダルを表示 */}
-      <UserBioModal
-        userId={selectedUserId|| ''}
-        open={isBioModalOpen}
-        onClose={() => setIsBioModalOpen(false)}
-      />
-    </Card>
+      </Box>
+
+      {/* 横線で仕切り */}
+      <Divider />
+    </Box>   
+    
   );
 };
 

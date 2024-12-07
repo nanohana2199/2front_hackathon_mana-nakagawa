@@ -4,9 +4,15 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getPosts } from '../api/post';
 import { getReplies } from '../api/reply';
+import { useNavigate } from 'react-router-dom';
+
 
 interface RepliesMap {
   [postId: string]: any[];
+}
+
+interface PostListProps {
+  userId?: string; // 特定のユーザーIDを指定する場合は渡す
 }
 
 type UserMap = {
@@ -17,20 +23,23 @@ type Post = {
   id: number;
   content: string;
   author: string;
-  user_id: string; }
+  user_id: string;
+  created_at: string;
+ }
 
-const PostList: React.FC = () => {
+const PostList: React.FC<PostListProps> = ({userId}) => {
   const [posts, setPosts] = useState<Post[]>([]); // 初期値を空配列
   const [replies, setReplies] = useState<RepliesMap>({}); // 初期値を空オブジェクト
   const [userAvatars, setUserAvatars] = useState<UserMap>({});
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const data = (await getPosts()) || []; // データが null の場合に備えて空配列を代入
+        const data = await getPosts(userId); // データが null の場合に備えて空配列を代入
         const sortedPosts = data.sort((a: Post, b: Post) => b.id - a.id);
-        setPosts(data);
+        setPosts(sortedPosts);
         setError(null);
       } catch (error) {
         if (error instanceof Error) {
@@ -40,7 +49,7 @@ const PostList: React.FC = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     const fetchReplies = async () => {
@@ -97,6 +106,16 @@ const PostList: React.FC = () => {
     fetchAvatars();
   }, [posts, replies]);
 
+  const handleAvatarClick = (userId: string) => {
+    if (!userId) {
+      console.warn('無効なユーザーIDです');
+      return;
+    }
+    navigate(`/user/${userId}`); // ユーザーIDに基づいてプロフィールページへ遷移
+  };
+
+
+
   return (
     <div>
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -105,10 +124,13 @@ const PostList: React.FC = () => {
       ) : (
         posts.map((post) => (
           <PostItem
-          key={post.id}
-          post={{ ...post, id: Number(post.id),author: post.author}}
-          replies={replies[String(post.id)] || []}
-          
+            key={post.id}
+            post={{
+              ...post, id: Number(post.id), author: post.author, created_at: post.created_at
+            }}
+            replies={replies[String(post.id)] || []}
+             onAvatarClick={handleAvatarClick
+            }          
           
           
         />
