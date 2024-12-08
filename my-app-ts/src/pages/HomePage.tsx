@@ -126,8 +126,15 @@ const HomePage: React.FC = () => {
             alignItems: 'center',
           }}
         >
+          <Box sx={{ width: '80px' }} />
+
+
+
+{/* 右側に滞在時間 */}
+<Box sx={{ display: 'flex', alignItems: 'center' }}>
           
           <Typography variant="body1" sx={{ ml: 1 }}>滞在時間: {elapsedTime}</Typography>
+        </Box>
         </Box>
       </Slide>
 
@@ -177,7 +184,7 @@ const HomePage: React.FC = () => {
             left: 0,
             right: 0,
             zIndex: 999, // オーバーレイの上に配置
-            top: '50%',
+            top: '30%',
             
            
           }}

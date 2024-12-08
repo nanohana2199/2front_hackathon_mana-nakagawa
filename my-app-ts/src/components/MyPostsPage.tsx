@@ -116,27 +116,28 @@ const MyPostsPage: React.FC = () => {
             )}
           </Box>
 
-          <Box sx={{ p: 2, position: 'relative', textAlign: 'center' }}>
-            <Avatar
-              src={userDetails.profileImage}
-              alt="User Avatar"
-              sx={{
-                width: 120,
-                height: 120,
-                border: '4px solid white',
-                position: 'relative',
-                mt: '-60px',
-                mx: 'auto',
-                boxShadow: 2
-              }}
-            />
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                あなたの投稿
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {userDetails.bio || '自己紹介文はありません。'}
-              </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', mt: '-40px', px: 2 }}> {/* アバター位置とテキストエリア調整 */}
+    <Avatar
+      src={userDetails.profileImage}
+      alt="User Avatar"
+      sx={{
+        width: 120,
+        height: 120,
+        border: '4px solid white',
+        boxShadow: 2,
+        mr: 2, // テキストとの間に余白を設定
+      }}
+    />
+    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', mt: '60px' }}> {/* アバター高さの半分から開始 */}
+      <Typography
+        variant="body1"
+        color="text.secondary"
+        sx={{
+          ml: 1, // 左方向の余白を調整
+        }}
+      >
+        {userDetails.bio || '自己紹介文はありません。'}
+      </Typography>
             </Box>
           </Box>
         </Paper>

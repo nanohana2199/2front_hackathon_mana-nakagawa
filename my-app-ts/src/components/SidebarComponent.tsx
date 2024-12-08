@@ -6,7 +6,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-
+import ListIcon from '@mui/icons-material/List';
 
 interface SidebarComponentProps {
   mobileOpen: boolean;
@@ -28,6 +28,8 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       navigate('/home');
     } else if (item === 'プロフィール設定') {
       navigate('/profile');
+     } else if (item === '自分の投稿') {
+        navigate('/my-posts');
     } else if (item === 'ログアウト') {
       onItemSelect(item); // ログアウト処理を通知
     }
@@ -73,6 +75,12 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
             icon={<AccountCircleIcon />}
             onClick={() => handleItemClick('プロフィール設定')}
           />
+          <BottomNavigationAction
+            label="自分の投稿"
+            icon={<ListIcon />}
+            onClick={() => handleItemClick('自分の投稿')}
+          />
+
           <BottomNavigationAction
             label="ログアウト"
             icon={<LogoutIcon />}

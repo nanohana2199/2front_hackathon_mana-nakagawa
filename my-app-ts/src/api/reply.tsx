@@ -24,7 +24,7 @@ export async function createReply(replyData: { content: string; postId: number; 
         }
 
          // 不適切なコンテンツの場合の特別な処理
-         if (response.status === 400) {
+         if (response.status === 403) {
           alert('不適切な内容が検出されました。');
           return { success: false, message: '不適切な内容が検出されました。' };
         }

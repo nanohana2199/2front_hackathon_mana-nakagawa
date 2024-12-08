@@ -50,11 +50,11 @@ const WarningAfterLogin = () => {
             left: 0,
             right: 0,
             zIndex: 1400,
-            fontSize: "2rem",
+            fontSize: "1rem",
             padding: "20px",
             textAlign: "center",
             fontWeight: "bold",
-            boxShadow: "0 0 20px rgba(255, 0, 0, 0.8)",
+            
             border: "2px solid #fff",
             justifyContent: "center",
             lineHeight: 1.5,

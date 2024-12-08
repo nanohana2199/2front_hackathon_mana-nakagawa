@@ -35,29 +35,48 @@ const LoginForm = () => {
   return (
     <Box
       sx={{
+        position: 'relative',
+        height: '100vh',
+        backgroundColor: '#5FA7EF',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between', // 上下を均等配置
         alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundImage: `url('/images/bg.jpg')`, // publicフォルダの画像を参照
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        padding: 3,
+        p: 2,
+        overflow: 'hidden', // スクロール防止
+        gap:'5px',
       }}
     >
+      {/* 世界と出会おう */}
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{
+          color: 'white',
+          fontWeight: 'bold',
+          textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
+          mt: 30, 
+        }}
+      >
+        世界と出会おう！
+      </Typography>
+
+      {/* ログインフォーム */}
       <Box 
         component="form" 
         onSubmit={handleSubmit}
         bgcolor="white" 
-        p={4} 
+        p={4}
         borderRadius={2} 
         boxShadow={3}
         width="100%"
-        maxWidth="400px"
+        maxWidth="350px"
+        sx={{
+          textAlign: 'center',
+        }}
       >
-        <Typography variant="h4" align="center" gutterBottom>
+        <Typography variant="h5" align="center" gutterBottom>
           ログイン
         </Typography>
         <TextField
@@ -78,7 +97,7 @@ const LoginForm = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         {errorMessage && (
-          <Alert severity="error" style={{ margin: "10px 0" }}>
+          <Alert severity="error" sx={{ my: 1 }}>
             {errorMessage}
           </Alert>
         )}
@@ -88,13 +107,14 @@ const LoginForm = () => {
           color="primary" 
           fullWidth
           size="large"
+          sx={{ mt: 1 }}
         >
           ログイン
         </Button>
         <Typography 
           variant="body2" 
           align="center" 
-          style={{ marginTop: "16px" }}
+          sx={{ mt: 1 }}
         >
           ユーザー登録は{" "}
           <Link to="/signup" style={{ textDecoration: "none", color: "#1976d2" }}>
@@ -102,6 +122,19 @@ const LoginForm = () => {
           </Link>
         </Typography>
       </Box>
+
+      {/* 下部の画像 */}
+      <Box
+        component="img"
+        src="/images/dag.png"
+        alt="背景画像"
+        sx={{
+          
+          height: 'auto',
+          maxWidth: '100%',
+          mb: 10,
+        }}
+      />
     </Box>
   );
 };

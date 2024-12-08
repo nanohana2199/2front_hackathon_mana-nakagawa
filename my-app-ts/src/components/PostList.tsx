@@ -27,6 +27,7 @@ type Post = {
   author: string;
   user_id: string;
   created_at: string;
+  image_url: string;
  }
 
 const PostList: React.FC<PostListProps> = ({userId, showDeleteButton = false}) => {
@@ -168,7 +169,7 @@ const PostList: React.FC<PostListProps> = ({userId, showDeleteButton = false}) =
           <PostItem
             key={post.id}
             post={{
-              ...post, id: Number(post.id), author: post.author, created_at: post.created_at
+              ...post, id: Number(post.id), author: post.author, created_at: post.created_at,image_url: post.image_url || null
             }}
             // showDeleteButtonがtrueの場合のみonDeleteを渡す
             onDelete={showDeleteButton ? () => handleDelete(post.id) : undefined}

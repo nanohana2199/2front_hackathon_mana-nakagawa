@@ -36,6 +36,7 @@ interface PostItemMainProps {
   onReplySubmit: (content: string) => void;
   onAvatarClick: (userId: string) => void;
   onDelete?: () => void; // 追加
+  postImageUrl?: string | null; // ←追加: 画像URLをオプショナルで受け取る
 }
 
 const PostItemMain: React.FC<PostItemMainProps> = ({
@@ -49,7 +50,8 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
   created_at,
   onReplySubmit,
   onAvatarClick,
-  onDelete
+  onDelete,
+  postImageUrl
 }) => {
   const [isReplying, setIsReplying] = useState<boolean>(false);
   const [replyContent, setReplyContent] = useState<string>('');
@@ -80,75 +82,108 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
   
 
   return (
-    // <Box sx={{ maxWidth: '600px', mx: 'auto', pb: 2, ml: isMobile ? 0 : '240px' sx={{
-      <Box>
-      <Card variant="outlined" sx={{ mb: 2, borderRadius: 2, boxShadow: 1, minWidth:'400px'}}>
-        <CardHeader
-          avatar={
-            <Avatar
-              src={userAvatar || '/images/default-avatar.png'}
-              alt="User Avatar"
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement; // 型アサーションを追加
-                console.warn('Failed to load avatar:', userAvatar);
-                target.src = '/images/default-avatar.png'; // 明示的にデフォルト画像を設定
-              }}
-              onClick={() => onAvatarClick(authorUserId)}
-              sx={{ cursor: 'pointer' }}
-            />
-          }
-          title={
-            <Typography variant="h6" component="div">
-              {author}
-            </Typography>
-          }
-          subheader={
-            <Typography variant="body2" color="text.secondary">
-              {formatDate(created_at)}
-            </Typography>
-          }
-          sx={{ pb: 0 }}
-        />
-        <CardContent sx={{ pt: 0 }}>
-          <Typography variant="body1" gutterBottom sx={{ mt: 1 }}>
-            {postContent}
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-            <LikeButton post_id={postId} user_id={userId || ''} />
-            <IconButton
-              onClick={() => setIsReplying(!isReplying)}
+    <Box>
+    <Card
+      variant="outlined"
+      sx={{ mb: 2, borderRadius: 2, boxShadow: 1, minWidth: '400px' }}
+    >
+      <CardHeader
+        avatar={
+          <Avatar
+            src={userAvatar || '/images/default-avatar.png'}
+            alt="User Avatar"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              console.warn('Failed to load avatar:', userAvatar);
+              target.src = '/images/default-avatar.png';
+            }}
+            onClick={() => onAvatarClick(authorUserId)}
+            sx={{ cursor: 'pointer' }}
+          />
+        }
+        title={
+          <Box>
+            {/* 投稿者名と投稿内容を同じ`Box`に配置 */}
+            <Box
               sx={{
-                ml: 2,
-                color: isReplying ? 'primary.main' : 'text.secondary',
-                transition: 'color 0.2s ease',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
-              <ChatBubbleOutlineIcon sx={{ fontSize: '16px' }} />
-            </IconButton>
-            {/* 削除ボタン: ユーザーがオーナーの場合のみ表示などの条件分岐しても良い */}
-            {onDelete && (
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {author}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'right', ml: 2 }}
+              >
+                {formatDate(created_at)}
+              </Typography>
+            </Box>
+            <Typography
+              variant="body1"
+              gutterBottom
+              sx={{ mt: 1, whiteSpace: 'pre-wrap' }}
+            >
+              {postContent}
+            </Typography>
+          </Box>
+        }
+        sx={{ pb: 0 }}
+      />
+  
+      {postImageUrl && (
+        <Box sx={{ mt: 2, px: 2 }}>
+          <img
+            src={postImageUrl}
+            alt="Post Image"
+            style={{ maxWidth: '100%', borderRadius: '8px' }}
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.src = '/images/default-image.png';
+            }}
+          />
+        </Box>
+      )}
+  
+      <CardContent sx={{ pt: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <LikeButton post_id={postId} user_id={userId || ''} />
+          <IconButton
+            onClick={() => setIsReplying(!isReplying)}
+            sx={{
+              ml: 2,
+              color: isReplying ? 'primary.main' : 'text.secondary',
+              transition: 'color 0.2s ease',
+            }}
+          >
+            <ChatBubbleOutlineIcon sx={{ fontSize: '16px' }} />
+          </IconButton>
+  
+          {onDelete && (
   <Box sx={{ ml: 2 }}>
-    <Button
-      variant="contained"
-      color="error"
-      size="small"
-      startIcon={<DeleteIcon />}
-      onClick={() => setShowConfirmDelete(true)} // モーダル表示用
-      sx={{
-        '&:hover': {
-          backgroundColor: 'error.dark',
-          transform: 'scale(1.05)',
-          transition: 'transform 0.2s ease',
-        },
-      }}
-    >
-      削除
-    </Button>
+    <IconButton
+  onClick={() => setShowConfirmDelete(true)}
+  sx={{
+    color: 'error.main',
+    '&:hover': {
+      backgroundColor: 'error.light', // ホバー時の背景色
+      transform: 'scale(1.05)', // 拡大
+      transition: 'transform 0.2s ease',
+    },
+  }}
+>
+  <DeleteIcon sx={{ fontSize: '16px' }} />
+</IconButton>
 
-    {/* モーダル部分 */}
-    {showConfirmDelete && (
-      <Dialog open={showConfirmDelete} onClose={() => setShowConfirmDelete(false)}>
+    {/* 削除確認モーダル */}
+    {showConfirmDelete !== undefined && (
+      <Dialog
+        open={showConfirmDelete}
+        onClose={() => setShowConfirmDelete(false)}
+      >
         <DialogTitle>削除の確認</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
@@ -161,7 +196,9 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
           </Button>
           <Button
             onClick={() => {
-              onDelete();
+              if (onDelete) {
+                onDelete(); // onDelete が存在する場合にのみ呼び出す
+              }
               setShowConfirmDelete(false);
             }}
             color="error"
@@ -174,32 +211,34 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
     )}
   </Box>
 )}
-          </Box>
 
-          {isReplying && (
-            <Box sx={{ mt: 2 }}>
-              <TextField
-                placeholder="コメントする"
-                value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
-                multiline
-                rows={3}
-                fullWidth
-                variant="outlined"
-              />
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                <Button variant="contained" onClick={handleReplySubmit}>
-                  返信
-                </Button>
-              </Box>
+</Box>
+  
+        {/* 返信フォーム */}
+        {isReplying && (
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              placeholder="コメントする"
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              multiline
+              rows={3}
+              fullWidth
+              variant="outlined"
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+              <Button variant="contained" onClick={handleReplySubmit}>
+                返信
+              </Button>
             </Box>
-          )}
-
-          <RepliesToggleSection replies={replies} />
-        </CardContent>
-        <Divider />
-      </Card>
-    </Box> 
+          </Box>
+        )}
+  
+        <RepliesToggleSection replies={replies} />
+      </CardContent>
+    </Card>
+  </Box>
+  
     
   );
 };
