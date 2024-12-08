@@ -22,7 +22,9 @@ const LoginForm = () => {
       await signInWithEmailAndPassword(auth, trimmedEmail, password);
 
   const currentTime = new Date().getTime(); // 現在時刻のタイムスタンプを取得
+  console.log("現在時刻（タイムスタンプ）:", currentTime);
   localStorage.setItem("loginTime", currentTime.toString()); // localStorageに保存
+  console.log("localStorageに保存した値:", localStorage.getItem("loginTime"));
   
       navigate("/home");
     } catch (error) {
