@@ -3,7 +3,7 @@ import { auth, storage } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { extractBirthDate } from '../utils/ocr';
-import { calculateAge, isUnder16 } from '../utils/ageValidation';
+import { isUnder16 } from '../utils/ageValidation';
 import { createUser } from "../api/user";
 import { useNavigate } from "react-router";
 import {
@@ -23,7 +23,7 @@ const SignUpForm = () => {
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // ローディング状態を追加
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleFileDrop = (event: React.DragEvent<HTMLDivElement>) => {
@@ -51,8 +51,8 @@ const SignUpForm = () => {
       return;
     }
 
-    setIsLoading(true); // ローディング開始
-    setErrorMessage(""); // エラーメッセージのリセット
+    setIsLoading(true);
+    setErrorMessage("");
 
     try {
       const storageRef = ref(storage, `images/${file.name}`);
@@ -84,99 +84,136 @@ const SignUpForm = () => {
     } catch (error) {
       console.error("Error during sign up:", error);
       setErrorMessage("サインアップに失敗しました。");
-    }finally {
-      setIsLoading(false); // ローディング終了
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <Box
       sx={{
-        maxWidth: 400,
-        mx: "auto",
-        mt: 5,
+        position: 'relative',
+        minHeight: '100vh',
+        backgroundColor: '#5FA7EF',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         p: 3,
-        border: "1px solid #ccc",
-        borderRadius: 2,
-        boxShadow: 2,
+      
       }}
     >
-      <Typography variant="h5" textAlign="center" gutterBottom>
-        サインアップ
+      <Box
+  component="form"
+  onSubmit={handleSubmit}
+  bgcolor="white"
+  p={4}
+  borderRadius={2}
+  boxShadow={3}
+  width="100%"
+  maxWidth="400px"
+  sx={{ overflow: 'hidden' ,mt:3}} // オーバーフローを隠して角丸を確実に適用
+>
+  <Typography variant="h4" align="center" gutterBottom>
+    サインアップ
+  </Typography>
+  <Stack spacing={2}>
+    <TextField
+      label="ユーザー名"
+      variant="outlined"
+      fullWidth
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+    />
+    <TextField
+      label="メールアドレス"
+      type="email"
+      variant="outlined"
+      fullWidth
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    />
+    <TextField
+      label="パスワード"
+      type="password"
+      variant="outlined"
+      fullWidth
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+    <Typography variant="body1" textAlign="center">
+      年齢確認の書類を<br />アップロードしてください
+    </Typography>
+    <div
+      onDrop={handleFileDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      style={{
+        border: dragOver ? "2px dashed #007bff" : "2px dashed #ccc",
+        padding: "20px",
+        borderRadius: "10px",
+        textAlign: "center",
+        backgroundColor: dragOver ? "#f0f8ff" : "#fff",
+        cursor: "pointer",
+      }}
+    >
+      <Typography>
+        {file ? `選択済みファイル: ${file.name}` : "ファイルをここにドロップしてください"}
       </Typography>
-      <form onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          <TextField
-            label="ユーザー名"
-            variant="outlined"
-            fullWidth
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <TextField
-            label="メールアドレス"
-            type="email"
-            variant="outlined"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            label="パスワード"
-            type="password"
-            variant="outlined"
-            fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Typography variant="body1" textAlign="center">
-            年齢確認の書類をアップロードしてください。
-          </Typography>
-          <div
-            onDrop={handleFileDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            style={{
-              border: dragOver ? "2px dashed #007bff" : "2px dashed #ccc",
-              padding: "20px",
-              borderRadius: "10px",
-              textAlign: "center",
-              backgroundColor: dragOver ? "#f0f8ff" : "#fff",
-              cursor: "pointer",
-            }}
-          >
-            <Typography>
-              {file ? `選択済みファイル: ${file.name}` : "ファイルをここにドロップしてください"}
-            </Typography>
-            <Button variant="contained" component="label" sx={{ mt: 1 }}>
-              ファイルを選択
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) =>
-                  setFile(e.target.files ? e.target.files[0] : null)
-                }
-              />
-            </Button>
-          </div>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            disabled={isLoading} // ローディング中は無効化
-            startIcon={isLoading && <CircularProgress size={20} />} // スピナーを追加
-          >
-            {isLoading ? "登録中..." : "登録"}
-          </Button>
-        </Stack>
-      </form>
-      {errorMessage && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {errorMessage}
-        </Alert>
-      )}
+      <Button variant="contained" component="label" sx={{ mt: 1 }}>
+        ファイルを選択
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) =>
+            setFile(e.target.files ? e.target.files[0] : null)
+          }
+        />
+      </Button>
+    </div>
+    <Button
+      type="submit"
+      variant="contained"
+      color="primary"
+      fullWidth
+      disabled={isLoading}
+      startIcon={isLoading && <CircularProgress size={20} />}
+    >
+      {isLoading ? "登録中..." : "登録"}
+    </Button>
+    {/* ログイン画面に戻るボタンにも丸角を追加 */}
+    <Button
+      variant="text"
+      fullWidth
+      onClick={() => navigate('/')}
+      sx={{ mt: 1, borderRadius: 2 }}
+    >
+      ログイン画面に戻る
+    </Button>
+  </Stack>
+  {errorMessage && (
+    <Alert severity="error" sx={{ mt: 2 }}>
+      {errorMessage}
+    </Alert>
+  )}
+</Box>
+
+      {/* ログインフォーム同様に画像を配置 */}
+      <Box
+        component="img"
+        src="/images/dag.png"
+        alt="背景画像"
+        sx={{
+          position: 'absolute',
+          top: 'calc(50% + 350px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '400px',
+          height: 'auto',
+          maxWidth: '100%',
+        }}
+      />
     </Box>
   );
 };

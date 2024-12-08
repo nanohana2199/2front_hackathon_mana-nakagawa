@@ -24,6 +24,7 @@ interface PostItemWithSidebarProps {
     author: string; // 新規追加
     user_id :string;
     created_at :string;
+    image_url :string | null;
 
 
   };
@@ -182,6 +183,7 @@ const PostItemWithSidebar: React.FC<PostItemWithSidebarProps> = ({ post, onAvata
           onReplySubmit={handleReplySubmit}
           onAvatarClick={handleAvatarClick}
           onDelete={onDelete}
+          postImageUrl={post.image_url || null} // 追加
         />
       </Box>
     </Box>

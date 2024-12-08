@@ -106,40 +106,42 @@ const UserProfile: React.FC = () => {
         }}
       >
         <Paper elevation={0} sx={{ borderRadius: 2, overflow: 'hidden', mb: 2, width: '100%', maxWidth: 800 }}>
-          <Box sx={{ position: 'relative', width: '100%', height: '200px', backgroundColor: '#f5f5f5' }}>
-            {userDetails.backgroundImage && (
-              <img
-                src={userDetails.backgroundImage}
-                alt="User Background"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            )}
-          </Box>
+  <Box sx={{ position: 'relative', width: '100%', height: '200px', backgroundColor: '#f5f5f5' }}>
+    {userDetails.backgroundImage && (
+      <img
+        src={userDetails.backgroundImage}
+        alt="User Background"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    )}
+  </Box>
 
-          <Box sx={{ p: 2, position: 'relative', textAlign: 'center' }}>
-            <Avatar
-              src={userDetails.profileImage}
-              alt="User Avatar"
-              sx={{
-                width: 120,
-                height: 120,
-                border: '4px solid white',
-                position: 'relative',
-                mt: '-60px',
-                mx: 'auto',
-                boxShadow: 2
-              }}
-            />
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
-                プロフィール
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                {userDetails.bio || '自己紹介文はありません。'}
-              </Typography>
-            </Box>
-          </Box>
-        </Paper>
+  <Box sx={{ display: 'flex', alignItems: 'center', mt: '-40px', px: 2 }}> {/* アバター位置とテキストエリア調整 */}
+    <Avatar
+      src={userDetails.profileImage}
+      alt="User Avatar"
+      sx={{
+        width: 120,
+        height: 120,
+        border: '4px solid white',
+        boxShadow: 2,
+        mr: 2, // テキストとの間に余白を設定
+      }}
+    />
+    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', mt: '60px' }}> {/* アバター高さの半分から開始 */}
+      <Typography
+        variant="body1"
+        color="text.secondary"
+        sx={{
+          ml: 1, // 左方向の余白を調整
+        }}
+      >
+        {userDetails.bio || '自己紹介文はありません。'}
+      </Typography>
+      </Box>
+  </Box>
+</Paper>
+
 
         <Divider sx={{ mb: 2, width: '100%', maxWidth: 800 }} />
 
