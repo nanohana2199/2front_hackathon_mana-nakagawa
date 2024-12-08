@@ -139,7 +139,8 @@ const PostItemMain: React.FC<PostItemMainProps> = ({
           <img
             src={postImageUrl}
             alt="Post Image"
-            style={{ maxWidth: '100%', borderRadius: '8px' }}
+            style={{ maxWidth: '100%', maxHeight: '300px', // 高さの制限を設定
+              objectFit: 'cover',borderRadius: '8px' }}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = '/images/default-image.png';
